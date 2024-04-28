@@ -1,7 +1,7 @@
 # credentials.py
 
 USER_EMAIL = "casalea"
-USER_PASSWORD = "1234"
+USER_PASSWORD = "casalea2024"
 
 # URL base da API
 BASE_URL_API = "http://api.sefaz.al.gov.br/sfz-economiza-alagoas-api/api/public/produto/pesquisa"

@@ -93,23 +93,18 @@ def update_sidebar():
                 """,
                 unsafe_allow_html=True
             )
-            selected = option_menu(
-                menu_title="Painéis",
-                options=["💰 Pesquisa de preços", "🚪 Sair"],
-                menu_icon="cast",
-                default_index=0
-            )
+
+            # Lista de opções para o selectbox
+            options = ["💰 Pesquisa de preços", "🚪 Sair"]
+            # Criar o selectbox
+            selected = st.selectbox("Selecione:", options)
+
         if selected == "💰 Pesquisa de preços":
             consulta_page()
-        # if selected == "📦 Estoques":
-        #     estoques_page()
-        # if selected == "Cadastro":
-        #     signup_page()
-        if selected == "🚪 Sair":
+        elif selected == "🚪 Sair":
             logout()
     else:
         st.sidebar.empty()
-
 
 def logout():
     confirm_logout()
@@ -372,17 +367,16 @@ def consulta_page():
 # Página de login
 def main():
     if not is_user_logged_in():
-        with st.sidebar:
             st.sidebar.image("resources/img/logo192.png")
             st.sidebar.image("resources/img/logo-topo.png")
-            selected = option_menu(
-                menu_title="Menu",
-                options=["Acesso"],
-                icons=["key"],
-                menu_icon="cast",
-                default_index=0
-            )
-        if selected == "Acesso":
+        #     selected = option_menu(
+        #         menu_title="Menu",
+        #         options=["Acesso"],
+        #         icons=["key"],
+        #         menu_icon="cast",
+        #         default_index=0
+        #     )
+        # if selected == "Acesso":
             login_page()
     else:
         update_sidebar()

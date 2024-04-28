@@ -12,14 +12,14 @@ from credentials import APP_TOKEN, BASE_URL_API, USER_EMAIL, USER_PASSWORD
 st.set_page_config(page_title=f"Dados Em FOCO! - Pesquisa", page_icon="bar_chart", layout="wide")
 
 
-def signin(email, password):
+def signin(login, password):
     # Substitua esta parte pelo código de autenticação da sua nova API ou método
-    if email == USER_EMAIL and password == USER_PASSWORD:
+    if login == USER_EMAIL and password == USER_PASSWORD:
         st.success("Login realizado com sucesso!")
         st.button("Acessar Painel")
         # Aqui você pode definir o token e detalhes do usuário como desejado
         token = "seu_token_de_autenticacao"
-        user_details = {"nome": "Usuário Exemplo", "email": email}
+        user_details = {"nome": "Usuário Exemplo", "login": login}
         st.session_state.token = token
         st.session_state.logged_in = True  # Definindo como True após o login
         st.session_state.user_details = user_details  # Armazenar os detalhes do usuário
@@ -67,11 +67,11 @@ def login_page():
 
     st.markdown("<h2 class='header-text'>🔐 Acesso ao sistema</h2>", unsafe_allow_html=True)
 
-    email = st.text_input("Email", key="email", max_chars=50)
+    login = st.text_input("Login", key="login", max_chars=50)
     password = st.text_input("Senha", type="password", key="password", max_chars=20)
 
     if st.button("Entrar", key="login_button"):
-        token = signin(email, password)
+        token = signin(login, password)
 
     st.markdown("</div>", unsafe_allow_html=True)
 

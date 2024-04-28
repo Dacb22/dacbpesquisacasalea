@@ -39,8 +39,8 @@ def login_page():
         """
         <style>
             .header-text {
-                color: #FFFF00;
-                background-color: #001F3F; /* Cor amarela */
+                color: #FFCE3F;
+                background-color: #7300AB; /* Cor amarela */
                 text-align: center;
                 font-size: 24px;
                 margin-bottom: 30px;

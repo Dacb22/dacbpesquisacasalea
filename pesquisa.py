@@ -96,6 +96,8 @@ def update_sidebar():
 
             # Lista de opções para o selectbox
             options = ["💰 Pesquisa de preços", "🚪 Sair"]
+            # st.sidebar.image("resources/img/logo192.png")
+            st.sidebar.image("resources/img/logo-topo.png")
             # Criar o selectbox
             selected = st.selectbox("Selecione:", options)
 
@@ -123,12 +125,15 @@ def confirm_logout():
 
 
 
+
 @st.cache_data
 def load_data(uploaded_file):
+    import time
     if uploaded_file is not None:
+        start_time = time.time()
         # Ler o arquivo EXCEL
         df = pd.read_excel(uploaded_file, dtype={'gtin': str})
-        with st.spinner("Carregando dados..."):    
+        with st.spinner("Carregando dados..."):
             # Lista para armazenar todos os dados coletados
             all_data = []
             not_found = []
@@ -190,85 +195,38 @@ def load_data(uploaded_file):
             df_vendas = pd.json_normalize(all_data)
             # Converter a coluna 'produto.venda.valorVenda' para numérica
             df_vendas['produto.venda.valorVenda'] = pd.to_numeric(df_vendas['produto.venda.valorVenda'], errors='coerce')
-
+            # df_vendas['estabelecimento.razaoSocial'] = df_vendas['estabelecimento.razaoSocial'].map(mapeamento_cnpjs)
+            df_vendas.dropna(subset=['estabelecimento.razaoSocial'], inplace=True)
+            # df_vendas
+            end_time = time.time()  # Registrar o tempo de término
+            st.info(f"Tempo de carregamento para {len(df['gtin'])-1} produto(s): {end_time - start_time:.0f} segundos.")  # Exibir o tempo de carregamento
             return df_vendas
 
+
 def consulta_page():
-    st.title('💰')
+    # st.title()
     col1, col2 = st.columns(2)
 
     # Adicionar texto personalizado acima do botão de upload
     col1.markdown("""
-    ### Carregue arquivo EXCEL com códigos de barras:
-    **ATENÇÃO PARA OS PONTOS ABAIXO:**
+        <div style='text-align: left; color: red;'>
+            <h2 style= 'text-align: center; font-family: sans-serif; background-color: #7300AB; color: #FFCE3F;'> 💰 Pesquisa de preços </h2>
+            <p></p>
+            <p><strong>**ATENÇÃO PARA OS PONTOS ABAIXO:</strong></p>
+            <p><strong>-Lembre-se de nomear coluna com códigos de barras para "gtin";</strong></p>
+            <p><strong>-Arquivo Formato • EXCEL XLSX.</strong></p>
+            <h3 style='font-family: sans-serif; color: white; text-align: left'>Carregue arquivo EXCEL com os códigos de barras abaixo:</h3>
+        </div>
+    """, unsafe_allow_html=True)
 
-    **-Lembre-se de nomear coluna com EANS de "git";**
-
-    **-Arquivo Formato • EXCEL XLSX.**
-    """)
+                #     color: #FFCE3F;
+                # background-color: #7300AB; /* Cor amarela */
 
     uploaded_file = col1.file_uploader("", type=["xlsx"])
 
     if uploaded_file is not None:
         df_vendas = load_data(uploaded_file)
-        mapeamento_cnpjs = {
-            'BARROS COMERCIO LTDA': 'SUPERMERCADO SAO DOMINGOS',
-            'ATACADAO S.A.': 'ATACADÃO',
-            'AMERICANAS S.A - EM RECUPERACAO JUDICIAL': 'AMERICANAS',
-            'FARMACIA SANTA ANITA LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'RAPHAEL ARAGAO DE ARAUJO - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'GONCALVES E ARAUJO FARMACIA LTDA': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'SAUDE FARMA LTDA - EPP': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'MEG FARMACIA LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'E LUCENA DE ARAUJO FARMACIA LTDA': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'ERICO LUCENA DE ARAUJO FARMACIA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'DROGA LUZ LTDA -  ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'FARMACIA DO TRABALHADOR MINIPRECO LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'FARMACIA SAO SEVERINO LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'E L DE ARAUJO FARMACIA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'FARMACIA QUEIROZ LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'FARMACIA LUCENA LTDA - EPP': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'NOSSA SENHORA DE FATIMA FARMACIA LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'R J INACIO COMERCIO LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
-            'BEZERRA & CLINERIO COMERCIO HORTIFRUTIGRANJEIROS LTDA': 'QUITANDARIA',
-            'BIG DISTRIBUIDOR IMPORTACAO E EXPORTACAO LTDA': 'BIG ATACADO',
-            'BOMPRECO SUPERMERCADOS DO NORDESTE LTDA': 'SUPERMERCADOS BOMPRECO',
-            'C&A MODAS S.A.': 'C&A',
-            'CASA LEA LTDA': 'CASA LEA',
-            'CENCOSUD BRASIL COMERCIAL S.A.': 'G. BARBOSA',
-            'CLINERIO COMERCIO DE HORTIFRUTIGRANJEIROS': 'QUITANDARIA',
-            'COMERCIAL DE EMBALAGENS DESCARTAVEIS E FESTAS LTDA - EPP': 'FELÍCIA',
-            'COMERCIAL DE MEDICAMENTOS SAMPAIO LTDA': 'DROGARIAS SAMPAIO',
-            'COMERCIAL DRUGSTORE LTDA': 'FARMACIA PERMANENTE',
-            'COMPRARBEM LTDA': 'COMPRARBEM SUPERMERCADO',
-            'COSMETICA VAREJO LTDA': 'COSMETICA VAREJO',
-            'D A L COMERCIO LTDA': 'FARMACIA DROGALIMA',
-            'DROGATIM DROGARIAS LTDA': 'FARMACIA PERMANENTE',
-            'EMPREENDIMENTOS PAGUE MENOS S/A': 'FARMACIA PAGUE MENOS',
-            'ESPECIARYA INDUSTRIA E COMERCIO LTDA': 'PALATO SUPERMERCADO',
-            'IAP COSMETICOS LTDA.': 'IAP! COSMETICOS',
-            'JARBAS COSTA BRAZ - ME': 'FARMACIA DO JARBAS',
-            'LEITE & PARANHOS LTDA': 'PRECO BOM',
-            'LAMENHA COMÉRCIO DE ALIMENTOS LTDA': 'SUPERMERCADO O CESTÃO BENEDITO BENTES',
-            'LOJAS RIACHUELO SA': 'LOJAS RIACHUELO',
-            'LOJAS RENNER S.A.': 'LOJAS RENNER',
-            'OLIVEIRA E NOBRE SUPERMERCADO LTDA': 'SUPERMERCADO NOBRE',
-            'P V SUPERMERCADO LTDA': 'PV SUPERMERCADO',
-            'PRECO CERTO COM. DE ALIMENTOS LTDA': 'SUPERMERCADO PRECO CERTO',
-            'PROFISSIONAL CABELOS E COSMETICOS': 'PROFISSIONAL CABELOS E COSMETICOS',
-            'RAIA DROGASIL S/A': 'DROGASIL',
-            'S. VIEIRA DA SILVA LTDA': 'CASA VIEIRA',
-            'SENDAS DISTRIBUIDORA S/A': 'ASSAÍ',
-            'SUPER GIRO DISTRIBUIDOR DE ALIMENTOS LTDA': 'SUPER GIRO',
-            'SUPER-AZUL COMERCIO VAREJISTA E ATACADISTA DE ALIMENTOS - LTDA': 'SUPERMERCADO AZULÃO',
-            'SUPERMERCADO LESTE OESTE LTDA': 'PONTO CERTO',
-            'SUPERMERCADOS CESTA DE ALIMENTOS LTDA': 'CESTA DE ALIMENTOS',
-            'T.M. SUPERMERCADO LTDA': 'SUPERMERCADO BOM DIA',
-            'UNI COMPRA SUPERMERCADOS LTDA': 'UNI COMPRA',
-            'WMB SUPERMERCADOS DO BRASIL LTDA.': 'SAMS CLUB'
-        }
         if df_vendas is not None:
-            df_vendas['estabelecimento.razaoSocial'] = df_vendas['estabelecimento.razaoSocial'].map(mapeamento_cnpjs)
             df_grouped1 = None
             df_grouped2 = None
 
@@ -279,15 +237,77 @@ def consulta_page():
                 with open(file_name, 'rb') as f:
                     data = f.read()
                     b64 = base64.b64encode(data).decode()
-                    href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="{file_name}">Faça Download da {file_name}</a>'
-                    st.markdown(href, unsafe_allow_html=True)
+                    href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="{file_name}" style="color: #7300AB; text-decoration: none;">Faça Download da planilha {file_name}</a>'
+                    styled_href = f'<div style="text-align: center; display: inline-block; padding: 5px; font-family: sans-serif; background-color: orange; color: #FFCE3F; padding: 10px;">{href}</div>'
+                    st.markdown(styled_href, unsafe_allow_html=True)
 
         # Função para filtrar e agregar os dados
             def filtrar_e_agregar(dados, filtro):
-                df_filtrado = dados[dados['estabelecimento.razaoSocial'].isin(filtro) | dados['estabelecimento.nomeFantasia'].isin(filtro)]
-                
-                # Substituir valores None em 'estabelecimento.razaoSocial' pelo nome fantasia 'FARMACIA DO TRABALHADOR DE ALAGOAS'
-                # df_filtrado.loc[df_filtrado['estabelecimento.razaoSocial'].isna(), 'estabelecimento.razaoSocial'] = 'FARMACIA DO TRABALHADOR DE ALAGOAS'
+                mapeamento_cnpjs = {
+                    'BARROS COMERCIO LTDA': 'SUPERMERCADO SAO DOMINGOS',
+                    'ATACADAO S.A.': 'ATACADÃO',
+                    'AMERICANAS S.A - EM RECUPERACAO JUDICIAL': 'AMERICANAS',
+                    # 'FARMACIA SANTA ANITA LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'RAPHAEL ARAGAO DE ARAUJO - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'GONCALVES E ARAUJO FARMACIA LTDA': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'SAUDE FARMA LTDA - EPP': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'MEG FARMACIA LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'E LUCENA DE ARAUJO FARMACIA LTDA': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'ERICO LUCENA DE ARAUJO FARMACIA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'DROGA LUZ LTDA -  ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'FARMACIA DO TRABALHADOR MINIPRECO LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'FARMACIA SAO SEVERINO LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'E L DE ARAUJO FARMACIA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'FARMACIA QUEIROZ LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'FARMACIA LUCENA LTDA - EPP': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'NOSSA SENHORA DE FATIMA FARMACIA LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'R J INACIO COMERCIO LTDA - ME': 'FARMACIA DO TRABALHADOR DE ALAGOAS',
+                    # 'BEZERRA & CLINERIO COMERCIO HORTIFRUTIGRANJEIROS LTDA': 'QUITANDARIA',
+                    # 'BIG DISTRIBUIDOR IMPORTACAO E EXPORTACAO LTDA': 'BIG ATACADO',
+                    # 'BOMPRECO SUPERMERCADOS DO NORDESTE LTDA': 'SUPERMERCADOS BOMPRECO',
+                    'C&A MODAS S.A.': 'C&A',
+                    # 'CASA LEA LTDA': 'CASA LEA',
+                    # 'CENCOSUD BRASIL COMERCIAL S.A.': 'G. BARBOSA',
+                    # 'CLINERIO COMERCIO DE HORTIFRUTIGRANJEIROS': 'QUITANDARIA',
+                    'COMERCIAL DE EMBALAGENS DESCARTAVEIS E FESTAS LTDA - EPP': 'FELÍCIA',
+                    # 'COMERCIAL DE MEDICAMENTOS SAMPAIO LTDA': 'DROGARIAS SAMPAIO',
+                    'COMERCIAL DRUGSTORE LTDA': 'FARMACIA PERMANENTE',
+                    # 'COMPRARBEM LTDA': 'COMPRARBEM SUPERMERCADO',
+                    'COSMETICA VAREJO LTDA': 'COSMETICA VAREJO',
+                    # 'D A L COMERCIO LTDA': 'FARMACIA DROGALIMA',
+                    'DROGATIM DROGARIAS LTDA': 'FARMACIA PERMANENTE',
+                    'EMPREENDIMENTOS PAGUE MENOS S/A': 'FARMACIA PAGUE MENOS',
+                    'ESPECIARYA INDUSTRIA E COMERCIO LTDA': 'PALATO SUPERMERCADO',
+                    'IAP COSMETICOS LTDA.': 'IAP! COSMETICOS',
+                    # 'JARBAS COSTA BRAZ - ME': 'FARMACIA DO JARBAS',
+                    'LEITE & PARANHOS LTDA': 'PRECO BOM',
+                    # 'LAMENHA COMÉRCIO DE ALIMENTOS LTDA': 'SUPERMERCADO O CESTÃO BENEDITO BENTES',
+                    'LOJAS RIACHUELO SA': 'LOJAS RIACHUELO',
+                    'LOJAS RENNER S.A.': 'LOJAS RENNER',
+                    'OLIVEIRA E NOBRE SUPERMERCADO LTDA': 'SUPERMERCADO NOBRE',
+                    'P V SUPERMERCADO LTDA': 'PV SUPERMERCADO',
+                    # 'PRECO CERTO COM. DE ALIMENTOS LTDA': 'SUPERMERCADO PRECO CERTO',
+                    'PROFISSIONAL CABELOS E COSMETICOS': 'PROFISSIONAL CABELOS E COSMETICOS',
+                    'RAIA DROGASIL S/A': 'DROGASIL',
+                    'S. VIEIRA DA SILVA LTDA': 'CASA VIEIRA',
+                    'SENDAS DISTRIBUIDORA S/A': 'ASSAÍ',
+                    # 'SUPER GIRO DISTRIBUIDOR DE ALIMENTOS LTDA': 'SUPER GIRO',
+                    # 'SUPER-AZUL COMERCIO VAREJISTA E ATACADISTA DE ALIMENTOS - LTDA': 'SUPERMERCADO AZULÃO',
+                    'SUPERMERCADO LESTE OESTE LTDA': 'PONTO CERTO',
+                    'SUPERMERCADOS CESTA DE ALIMENTOS LTDA': 'CESTA DE ALIMENTOS',
+                    # 'T.M. SUPERMERCADO LTDA': 'SUPERMERCADO BOM DIA',
+                    'UNI COMPRA SUPERMERCADOS LTDA': 'UNI COMPRA',
+                    # 'WMB SUPERMERCADOS DO BRASIL LTDA.': 'SAMS CLUB'
+                }
+                # Verifique se as chaves do mapeamento existem nas colunas do DataFrame
+                chaves_validas = [chave for chave in mapeamento_cnpjs.keys() if chave in dados['estabelecimento.razaoSocial'].unique()]
+
+                # Filtrar apenas as linhas com chaves válidas e aplicar o mapeamento
+                df_filtrado = dados[dados['estabelecimento.razaoSocial'].isin(chaves_validas)].copy()
+                df_filtrado['estabelecimento.razaoSocial'] = df_filtrado['estabelecimento.razaoSocial'].map(mapeamento_cnpjs)
+
+                # Filtrar linhas que atendem ao filtro
+                df_filtrado = df_filtrado[df_filtrado['estabelecimento.razaoSocial'].isin(filtro) | df_filtrado['estabelecimento.nomeFantasia'].isin(filtro)]
 
                 # Agregar os dados
                 df_agregado = df_filtrado.groupby(['produto.gtin', 'estabelecimento.razaoSocial']).agg(
@@ -296,18 +316,20 @@ def consulta_page():
                     preço_Médio=('produto.venda.valorVenda', 'mean'),
                     preço_Moda=('produto.venda.valorVenda', lambda x: x.mode().iloc[0] if not x.mode().empty else None)
                 ).reset_index()
-
+                # Arredondar os valores para duas casas decimais
+                df_agregado['preço_Mínimo'] = df_agregado['preço_Mínimo'].round(2)
+                df_agregado['preço_Máximo'] = df_agregado['preço_Máximo'].round(2)
+                df_agregado['preço_Médio'] = df_agregado['preço_Médio'].round(2)
+                df_agregado['preço_Moda'] = df_agregado['preço_Moda'].round(2)
                 return df_agregado
 
-
             # Listas de empresas para cada categoria
-            cosmeticos = ['CASA LEA', 'COSMETICA VAREJO', 'IAP! COSMETICOS', 'PROFISSIONAL CABELOS E COSMETICOS', 'PROFISSIONAL CABELOS E COSMETICOS']
-            varejo_alimentar = ['UNI COMPRA', 'SAMS CLUB', 'SUPERMERCADO BOM DIA', 'CESTA DE ALIMENTOS', 'PONTO CERTO', 'SUPERMERCADO AZULÃO', 'SUPER GIRO', 'SUPERMERCADO PRECO CERTO', 'PV SUPERMERCADO', 'SUPERMERCADO NOBRE', 'SUPERMERCADO O CESTÃO BENEDITO BENTES', 'PRECO BOM', 'PALATO SUPERMERCADO', 'COMPRARBEM SUPERMERCADO', 'G. BARBOSA', 'SUPERMERCADOS BOMPRECO', 'SUPERMERCADO SAO DOMINGOS']
-            atacado_alimentar = ['ASSAÍ', 'ATACADÃO', 'BIG ATACADO']
+            cosmeticos = ['COSMETICA VAREJO', 'IAP! COSMETICOS', 'PROFISSIONAL CABELOS E COSMETICOS', 'PROFISSIONAL CABELOS E COSMETICOS']
+            varejo_alimentar = ['UNI COMPRA', 'CESTA DE ALIMENTOS', 'PONTO CERTO', 'PV SUPERMERCADO', 'SUPERMERCADO NOBRE', 'PRECO BOM', 'PALATO SUPERMERCADO', 'SUPERMERCADO SAO DOMINGOS']
+            atacado_alimentar = ['ASSAÍ', 'ATACADÃO']
             moda = ['C&A', 'LOJAS RIACHUELO', 'LOJAS RENNER']
             multi_departamentos = ['AMERICANAS', 'FELÍCIA', 'CASA VIEIRA']
-            farmacias = ['FARMACIA DO TRABALHADOR DE ALAGOAS', 'DROGARIAS SAMPAIO', 'FARMACIA PERMANENTE', 'FARMACIA DROGALIMA', 'FARMACIA PAGUE MENOS', 'DROGASIL']
-            outros = ['QUITANDARIA']
+            farmacias = ['FARMACIA PERMANENTE', 'FARMACIA PAGUE MENOS', 'DROGASIL']
 
             # Defina a ordem das categorias conforme o CNPJ
             ordem_categorias = [
@@ -316,19 +338,18 @@ def consulta_page():
                 multi_departamentos,
                 farmacias,
                 moda,
-                atacado_alimentar,
-                outros
+                atacado_alimentar
             ]
             # Filtrar por Razão Social no sidebar
             with st.sidebar:
-                selected_categorias = st.multiselect("Filtrar concorrentes por segmento:", ["Todos", "Cosméticos", "Varejo Alimentar", "Multi Departamentos", "Farmácias", "Moda", "Atacado Alimentar", "Outros"])
+                selected_categorias = st.multiselect("Filtrar concorrentes por segmento:", ["Todos", "Cosméticos", "Varejo Alimentar", "Multi Departamentos", "Farmácias", "Moda", "Atacado Alimentar"])
 
             resultados_por_categoria = []
 
             # Iterar sobre as categorias selecionadas e adicionar resultados filtrados
             for categoria in selected_categorias:
                 if categoria == "Todos":
-                    filtro = cosmeticos + varejo_alimentar + multi_departamentos + farmacias + moda + atacado_alimentar + outros
+                    filtro = cosmeticos + varejo_alimentar + multi_departamentos + farmacias + moda + atacado_alimentar
                 elif categoria == "Cosméticos":
                     filtro = cosmeticos
                 elif categoria == "Varejo Alimentar":
@@ -341,8 +362,8 @@ def consulta_page():
                     filtro = moda
                 elif categoria == "Atacado Alimentar":
                     filtro = atacado_alimentar
-                elif categoria == "Outros":
-                    filtro = outros
+                # elif categoria == "Outros":
+                #     filtro = outros
 
                 df_agregado = filtrar_e_agregar(df_vendas, filtro)
                 resultados_por_categoria.append(df_agregado)
@@ -350,17 +371,15 @@ def consulta_page():
             # Combinar os resultados de todas as categorias
             if resultados_por_categoria:
                 df_completo = pd.concat(resultados_por_categoria, ignore_index=True)
-
                 # Exibir o DataFrame completo
                 st.write(df_completo)
 
                 # Exportar para Excel
                 export_excel(df_completo, "Pesquisa_de_Precos.xlsx")
                 # Identificar linhas com valores None na coluna 'estabelecimento.razaoSocial'
-                rows_with_none = df_completo[df_completo['estabelecimento.razaoSocial'].isna()]
-
-                # Exibir as linhas com valores None
-                print(rows_with_none)
+                # rows_with_none = df_completo[df_completo['estabelecimento.razaoSocial'].isna().map(mapeamento_cnpjs)]
+                # # Exibir as linhas com valores None
+                # print(rows_with_none)
             else:
                 st.warning("Por favor, selecione o(s) segmento(s) dos concorrrente(s) para continuar.")
 

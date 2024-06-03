@@ -242,6 +242,7 @@ def consulta_page():
         # Função para filtrar e agregar os dados
             def filtrar_e_agregar(dados, filtro):
                 mapeamento_cnpjs = {
+                    'BC PIEDADE DISTRIBUIDORA PRODUTOS DE BELEZA LTDA': 'BEL COSMETICOS',
                     'BARROS COMERCIO LTDA': 'SUPERMERCADO SAO DOMINGOS',
                     'ATACADAO S.A.': 'ATACADÃO',
                     'AMERICANAS S.A - EM RECUPERACAO JUDICIAL': 'AMERICANAS',
@@ -322,7 +323,7 @@ def consulta_page():
                 return df_agregado
 
             # Listas de empresas para cada categoria
-            cosmeticos = ['COSMETICA VAREJO', 'IAP! COSMETICOS', 'PROFISSIONAL CABELOS E COSMETICOS', 'PROFISSIONAL CABELOS E COSMETICOS']
+            cosmeticos = ['BEL COSMETICOS', 'COSMETICA VAREJO', 'IAP! COSMETICOS', 'PROFISSIONAL CABELOS E COSMETICOS', 'PROFISSIONAL CABELOS E COSMETICOS']
             varejo_alimentar = ['UNI COMPRA', 'CESTA DE ALIMENTOS', 'PONTO CERTO', 'PV SUPERMERCADO', 'SUPERMERCADO NOBRE', 'PRECO BOM', 'PALATO SUPERMERCADO', 'SUPERMERCADO SAO DOMINGOS']
             atacado_alimentar = ['ASSAÍ', 'ATACADÃO']
             moda = ['C&A', 'LOJAS RIACHUELO', 'LOJAS RENNER']

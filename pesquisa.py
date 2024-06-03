@@ -157,13 +157,11 @@ def load_data(uploaded_file):
                         "gtin": title
                     },
                     "estabelecimento": {
-                        "geolocalizacao": {
-                            "latitude": -9.568061100000001,
-                            "longitude": -35.79424830000001,
-                            "raio": 15
+                        "municipio": {
+                            "codigoIBGE": 2704302,
                         }
                     },
-                    "dias": 7,
+                    "dias": 9,
                     "pagina": 1,
                     "registrosPorPagina": 500
                 }
